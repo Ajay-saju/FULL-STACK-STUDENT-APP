@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+message Student{
+    int32 id =1;
+    string name = 2;
+    string dipartment =3;
+    string emai = 4;
+    bytes image_data = 5;
+} 
+
+// Request message for all students
+message GetStudentListRequest{
+
+}
+
+// Response message for all students
+message GetStudentListResponse{
+    repeated Student studentslist = 1;
+}
+
+// Requeist message for create a student 
+
+message CreateStudentRequest{
+    Student student =1;
+    string msg =2;
+    
+}
+
+// Response for create a student
+
+message CreateStudentResponse {
+    int32 id = 1;
+    string msg = 2;
+}
+
+// Request message for reading a student
+
+message ReadStudentRequest{
+    int32 id = 1;
+    bool msg = 2;
+}
+
+// Response message for reading a student
+
+message ReadStudentResponse{
+    Student student =1 ;
+    bool msg = 2;
+}
+
+// Request for updating a student
+message UpdateStudentRequest{
+    int32 id = 1;
+    Student student= 2;
+}
+
+// Response for updating a student
+
+message UpdateStudentResponse{
+bool sucess=1;
+}
+
+// Request for delete a student details 
+
+message DeleteStudentRequest{
+    int32 id = 1;
+} 
+
+// Response for delete a student
+
+message DeleteStudentResponse{
+    bool sucess=1;
+}
+
+
+
+// message GetStudentByIdRequest{
+//     int32 id =1;
+// }
+
+
+
+service StudentService{
+    // rpc getStudent(GetStudentByIdRequest) returns (Student);
+    rpc GetAllStudentDetails(GetStudentListRequest) returns (GetStudentListResponse);
+    rpc CreateStudent(CreateStudentRequest) returns (CreateStudentResponse);
+    rpc ReadStudent(ReadStudentRequest) returns (ReadStudentResponse);
+    rpc UpdateStudent(UpdateStudentRequest) returns (UpdateStudentResponse);
+    rpc DeleteStudent(DeleteStudentRequest) returns (DeleteStudentResponse);
+}
