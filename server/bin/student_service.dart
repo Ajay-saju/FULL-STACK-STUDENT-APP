@@ -12,7 +12,7 @@ class StudentService extends StudentServiceBase {
   bool isDeleted = false;
   bool isRead = false;
   bool isUpdated = false;
-   List<Student> myStudentDetails = [];
+  List<Student> myStudentDetails = [];
   // void cretingAStudentObj() {
   //   final obj = Student();
   //   obj.name = 'ajay';
@@ -87,7 +87,7 @@ class StudentService extends StudentServiceBase {
 
   @override
   Future<UpdateStudentResponse> updateStudent(
-      ServiceCall call, UpdateStudentRequest request) async {
+      ServiceCall call, UpdateStudentRequest request) async { 
     var studentId = request.id;
     for (var student in myStudentDetails) {
       if (student.id == studentId) {
