@@ -138,7 +138,8 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
 
     updateUserDetails(String name, String email, String dep, List<int> imageData,
       int id) async {
-    final request = stDetails.UpdateStudentRequest()
+    final request =
+     stDetails.UpdateStudentRequest()
       ..student = (Student()
         ..id = id
         ..name = name
