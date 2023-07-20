@@ -1,8 +1,10 @@
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:protos/protos.dart';
 import 'package:stuapp/add_student.dart';
 import 'package:protos/src/generated/student_details.pbgrpc.dart' as stDetails;
+import 'package:stuapp/student_details_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
   late ClientChannel _channel;
   late StudentServiceClient _stb;
   Student? _student;
+  GetStudentListResponse? studentList;
+  bool _isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -50,8 +54,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _getStudentsList() async {
-    var data = await _stb.getAllStudentDetails(stDetails.GetStudentListRequest());
-    print(data.toString());
+    setState(() {
+      _isLoading = true;
+    });
+
+    studentList =
+        await _stb.getAllStudentDetails(stDetails.GetStudentListRequest());
+
+    setState(() {
+      _isLoading = false;
+    });
+    print(studentList.toString());
+  }
+
+  Uint8List getStudentImage(List<int> imageBytes) {
+    Uint8List uint8List = Uint8List.fromList(imageBytes);
+    // MemoryImage memoryImage = await MemoryImage(uint8List);
+
+    return uint8List;
   }
 
   @override
@@ -61,20 +81,37 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _student != null
-                ? Text(_student!.name)
-                : const Text('Student Empty'),
-          ],
-        ),
-      ),
+      body: SafeArea(
+          child: _isLoading == true || studentList!.studentslist.isEmpty
+              ? const Center(
+                  child: Text('Student Empty'),
+                )
+              : ListView.builder(
+                  itemBuilder: (ctx, index) {
+                    Uint8List imageBytes = Uint8List.fromList(
+                        studentList!.studentslist[index].imageData);
+                    return ListTile(
+                      title: Text(studentList!.studentslist[index].name),
+                      leading: CircleAvatar(
+                          backgroundImage: MemoryImage(imageBytes)),
+                      trailing: const Icon(Icons.edit),
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (ctx) => StudentDetailsPage(
+                                  id: studentList!.studentslist[index].id,
+                                  client: _stb,
+                                )));
+                      },
+                    );
+                  },
+                  itemCount: studentList!.studentslist.length,
+                )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const AddStudentPage()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => AddStudentPage(
+                    stb: _stb,
+                  )));
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),

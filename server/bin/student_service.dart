@@ -22,11 +22,10 @@ class StudentService extends StudentServiceBase {
   //   myStudentDetails.add(obj);
   // }
 
- 
   @override
   Future<CreateStudentResponse> createStudent(
       ServiceCall call, CreateStudentRequest request) async {
-        // cretingAStudentObj();
+    // cretingAStudentObj();
     maxStudentId++;
     int newStudentId = maxStudentId;
 
@@ -87,11 +86,22 @@ class StudentService extends StudentServiceBase {
 
   @override
   Future<UpdateStudentResponse> updateStudent(
-      ServiceCall call, UpdateStudentRequest request) async { 
-    var studentId = request.id;
+      ServiceCall call, UpdateStudentRequest request) async {
+        print('==============${request.student.name}');
+        print(request.student.id);
+    int studentId = request.student.id;
+    print(studentId);
+    // for (int i=0;i<myStudentDetails.length;i++){
+    //     print(myStudentDetails[i].id);
+    //   if (myStudentDetails[i].id == studentId ) {
+    //     myStudentDetails[studentId] = request.student;
+    //     isUpdated = true;
+    //   }
+    // }
     for (var student in myStudentDetails) {
-      if (student.id == studentId) {
-        myStudentDetails[student.id] = request.student;
+      print(student.id);
+      if (student.id == studentId ) {
+        myStudentDetails[student.id-1] = request.student;
         isUpdated = true;
       }
     }

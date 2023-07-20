@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:protos/protos.dart';
 import 'package:protos/src/generated/student_details.pbgrpc.dart' as stDetails;
+
 class AddStudentPage extends StatefulWidget {
-  
-  const AddStudentPage({super.key});
+  final StudentServiceClient stb;
+
+  const AddStudentPage({
+    super.key, 
+    required this.stb,
+  });
 
   @override
   State<AddStudentPage> createState() => _AddStudentPageState();
@@ -17,18 +22,19 @@ class _AddStudentPageState extends State<AddStudentPage> {
   final emailController = TextEditingController();
   final departmentController = TextEditingController();
   final picker = ImagePicker();
+  List<int> image = [];
 
-  late ClientChannel _channel;
-  late StudentServiceClient _client;
-  Student? _student;
+  // late ClientChannel _channel;
+  // late StudentServiceClient _client;
+  // Student? _student;
   @override
   void initState() {
     super.initState();
-    _channel = ClientChannel('192.168.29.150',
-        port: 8080,
-        options:
-            const ChannelOptions(credentials: ChannelCredentials.insecure()));
-    _client = StudentServiceClient(_channel);
+    // _channel = ClientChannel('192.168.29.150',
+    //     port: 8080,
+    //     options:
+    //         const ChannelOptions(credentials: ChannelCredentials.insecure()));
+    // _client = StudentServiceClient(_channel);
   }
 
   @override
@@ -58,19 +64,18 @@ class _AddStudentPageState extends State<AddStudentPage> {
           ),
           ElevatedButton(
               onPressed: () async {
-                final pickedImage =
-                    await picker.pickImage(source: ImageSource.gallery);
-
-                if (pickedImage != null) {
-                  File selectedImage = File(pickedImage.path);
-                }
+                image = await pickImage();
               },
               child: const Text('Select an image')),
         ],
       ),
       floatingActionButton: ElevatedButton(
           onPressed: () {
-            addStudentsDetils();
+            addStudentsDetils(
+                name: nameController.text,
+                department: departmentController.text,
+                email: emailController.text,
+                imageData: image);
           },
           child: const Text('Save All Details')),
     );
@@ -116,24 +121,34 @@ class _AddStudentPageState extends State<AddStudentPage> {
         ));
   }
 
-  Future<void> pickImage() async {
+  Future<List<int>> pickImage() async {
+    List<int> imageBytes = [];
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
-      File selectedImage = File(pickedImage.path);
+      File imageFile = File(pickedImage.path);
+      imageBytes = await imageFile.readAsBytes();
     }
+    return imageBytes;
   }
 
-  void addStudentsDetils() async {
+  void addStudentsDetils(
+      {required String name,
+      required String department,
+      required String email,
+      required List<int> imageData}) async {
     final request = stDetails.CreateStudentRequest()
       ..student = (Student()
-        ..name = 'John Doe'
-        ..dipartment = 'Computer Science'
-        ..emai = 'johndoe@example.com');
+        ..name = name
+        ..dipartment = department
+        ..emai = email
+        ..imageData = imageData);
     try {
-      final response = await _client.createStudent(request);
-      // print(response.headers.toString());
+      final response = await widget.stb.createStudent(request);
+      if(response.msg=='Student created Successfully'){
+        Navigator.pop(context);
+      }
       print(response.toString());
     } catch (e) {
       print(e.toString());
