@@ -5,11 +5,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:protos/protos.dart';
 import 'package:protos/src/generated/student_details.pbgrpc.dart' as stDetails;
 
+import 'main.dart';
+
 class AddStudentPage extends StatefulWidget {
   final StudentServiceClient stb;
 
   const AddStudentPage({
-    super.key, 
+    super.key,
     required this.stb,
   });
 
@@ -146,8 +148,16 @@ class _AddStudentPageState extends State<AddStudentPage> {
         ..imageData = imageData);
     try {
       final response = await widget.stb.createStudent(request);
-      if(response.msg=='Student created Successfully'){
-        Navigator.pop(context);
+      if (response.msg == 'Student created Successfully') {
+        // ignore: use_build_context_synchronously
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const MyHomePage(
+                    title: 'Flutterg RPC Demo Student App',
+                  )),
+          (route) => false,
+        );
       }
       print(response.toString());
     } catch (e) {

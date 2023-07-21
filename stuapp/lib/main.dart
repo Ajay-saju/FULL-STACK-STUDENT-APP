@@ -53,6 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
     _getStudentsList();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _getStudentsList();
+  }
+
   void _getStudentsList() async {
     setState(() {
       _isLoading = true;
@@ -100,21 +106,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                 context: (context),
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text('Delete Item'),
-                                    content: Text(
+                                    title: const Text('Delete Item'),
+                                    content: const Text(
                                         'Are you sure you want to delete this item?'),
                                     actions: [
                                       // Delete Button
                                       TextButton(
                                         onPressed: () {
-                                          deleteStudent(studentList!.studentslist[index].id);
+                                          deleteStudent(studentList!
+                                              .studentslist[index].id);
                                           // Perform the delete operation here.
                                           // For demo purposes, we'll just close the dialog.
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text('Delete'),
+                                        child: const Text('Delete'),
                                         style: TextButton.styleFrom(
-                                          primary: Colors
+                                          foregroundColor: Colors
                                               .red, // Set the text color to red
                                         ),
                                       ),
@@ -124,14 +131,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Navigator.of(context)
                                               .pop(); // Close the dialog
                                         },
-                                        child: Text('Cancel'),
+                                        child: const Text('Cancel'),
                                       ),
                                     ],
                                   );
                                 });
-                            // 
+                            //
                           },
-                          child: Icon(Icons.delete)),
+                          child: const Icon(Icons.delete)),
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (ctx) => StudentDetailsPage(
@@ -157,6 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void deleteStudent(int id) async {
-    _stb.deleteStudent(stDetails.DeleteStudentRequest()..id = id);
+    var response =
+        _stb.deleteStudent(stDetails.DeleteStudentRequest()..id = id);
+
+    _getStudentsList();
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:protos/protos.dart';
 import 'package:protos/src/generated/student_details.pbgrpc.dart' as stDetails;
+import 'package:stuapp/main.dart';
 
 class StudentDetailsPage extends StatefulWidget {
   final int id;
@@ -136,22 +137,28 @@ class _StudentDetailsPageState extends State<StudentDetailsPage> {
     );
   }
 
-    updateUserDetails(String name, String email, String dep, List<int> imageData,
+  updateUserDetails(String name, String email, String dep, List<int> imageData,
       int id) async {
-    final request =
-     stDetails.UpdateStudentRequest()
+    final request = stDetails.UpdateStudentRequest()
       ..student = (Student()
         ..id = id
         ..name = name
         ..emai = email
         ..dipartment = dep
         ..imageData = imageData);
-        print(request);
+    print(request);
     try {
       final response = await widget.client.updateStudent(request);
       if (response.sucess == true) {
         print('data updated');
-        Navigator.pop(context);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MyHomePage(
+                    title: 'Flutterg RPC Demo Student App',
+                  )),
+          (route) => false,
+        );
         print(response.toString());
       } else {
         print(response.toString());
